@@ -1,0 +1,3 @@
+read the readme and install webpack server
+
+before installing try change the 0.0.0.0 to localhost also if installed

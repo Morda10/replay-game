@@ -1,10 +1,13 @@
 import { makeSprite, t, GameProps } from "@replay/core";
 import { WebInputs, RenderCanvasOptions } from "@replay/web";
 import { iOSInputs } from "@replay/swift";
+import { Level } from "./level/Level";
+import { Menu } from "./level/Menu/Menu";
 
 export const options: RenderCanvasOptions = {
   dimensions: "scale-up",
 };
+
 
 export const gameProps: GameProps = {
   id: "Game",
@@ -32,6 +35,7 @@ type GameState = {
   posY: number;
   targetX: number;
   targetY: number;
+  view: "menu" | "level";
 };
 
 export const Game = makeSprite<GameProps, GameState, WebInputs | iOSInputs>({
@@ -49,6 +53,7 @@ export const Game = makeSprite<GameProps, GameState, WebInputs | iOSInputs>({
       posY: 0,
       targetX: 0,
       targetY: 0,
+      view: "level"
     };
   },
 
@@ -71,10 +76,11 @@ export const Game = makeSprite<GameProps, GameState, WebInputs | iOSInputs>({
       posY: posY + (targetY - posY) / 10,
       targetX,
       targetY,
+      view: "level"
     };
   },
 
-  render({ state }) {
+  render({ state, updateState }) {
     if (!state.loaded) {
       return [
         t.text({
@@ -83,12 +89,8 @@ export const Game = makeSprite<GameProps, GameState, WebInputs | iOSInputs>({
         }),
       ];
     }
+    const inMenuScreen = state.view === "menu";
     return [
-      t.text({
-        color: "red",
-        text: "Hello Replay! To get started, edit src/index.ts",
-        y: 50,
-      }),
       t.image({
         testId: "icon",
         x: state.posX,
@@ -97,6 +99,23 @@ export const Game = makeSprite<GameProps, GameState, WebInputs | iOSInputs>({
         width: 50,
         height: 50,
       }),
+      Level({
+        id: "level",
+        paused: inMenuScreen,
+      }),
+      inMenuScreen
+        ? Menu({
+          id: "menu",
+          start: () => {
+            updateState((prevState) => {
+              return {
+                ...prevState,
+                view: "level",
+              };
+            });
+          },
+        })
+        : null,
     ];
   },
 });

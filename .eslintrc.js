@@ -12,7 +12,6 @@ module.exports = {
   plugins: ["@typescript-eslint"],
   extends: [
     "plugin:@typescript-eslint/recommended",
-    "plugin:prettier/recommended",
   ],
   rules: {
     "@typescript-eslint/no-use-before-define": [
@@ -22,10 +21,11 @@ module.exports = {
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
     "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/ban-types": "off",
   },
   overrides: [
     {
-      files: ["*.js"],
+      files: ["*.js", "*.ts"],
       rules: {
         "@typescript-eslint/no-var-requires": "off",
       },

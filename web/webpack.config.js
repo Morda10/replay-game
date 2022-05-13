@@ -41,7 +41,7 @@ module.exports = {
     path: path.resolve(__dirname, "dist"),
   },
   devServer: {
-    host: "0.0.0.0",
+    host: "localhost",
     // Codesandbox support
     disableHostCheck: true,
   },
