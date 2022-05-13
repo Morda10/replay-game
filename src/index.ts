@@ -31,10 +31,6 @@ export const gameProps: GameProps = {
 
 type GameState = {
   loaded: boolean;
-  posX: number;
-  posY: number;
-  targetX: number;
-  targetY: number;
   view: "menu" | "level";
 };
 
@@ -42,40 +38,36 @@ export const Game = makeSprite<GameProps, GameState, WebInputs | iOSInputs>({
   init({ updateState, preloadFiles }) {
     preloadFiles({
       audioFileNames: ["boop.wav"],
-      imageFileNames: ["icon.png"],
+      imageFileNames: ["icon.png", "Pink_Monster.png", "flipped-pink-player.png"],
     }).then(() => {
       updateState((state) => ({ ...state, loaded: true }));
     });
 
     return {
       loaded: false,
-      posX: 0,
-      posY: 0,
-      targetX: 0,
-      targetY: 0,
       view: "level"
     };
   },
 
-  loop({ state, device, getInputs }) {
+  loop({ state }) {
     if (!state.loaded) return state;
 
-    const { pointer } = getInputs();
-    const { posX, posY } = state;
-    let { targetX, targetY } = state;
+    // const { pointer } = getInputs();
+    // const { posX, posY } = state;
+    // let { targetX, targetY } = state;
 
-    if (pointer.justPressed) {
-      device.audio("boop.wav").play();
-      targetX = pointer.x;
-      targetY = pointer.y;
-    }
+    // if (pointer.justPressed) {
+    //   device.audio("boop.wav").play();
+    //   targetX = pointer.x;
+    //   targetY = pointer.y;
+    // }
 
     return {
       loaded: true,
-      posX: posX + (targetX - posX) / 10,
-      posY: posY + (targetY - posY) / 10,
-      targetX,
-      targetY,
+      // posX: posX + (targetX - posX) / 10,
+      // posY: posY + (targetY - posY) / 10,
+      // targetX,
+      // targetY,
       view: "level"
     };
   },
@@ -91,14 +83,6 @@ export const Game = makeSprite<GameProps, GameState, WebInputs | iOSInputs>({
     }
     const inMenuScreen = state.view === "menu";
     return [
-      t.image({
-        testId: "icon",
-        x: state.posX,
-        y: state.posY,
-        fileName: "icon.png",
-        width: 50,
-        height: 50,
-      }),
       Level({
         id: "level",
         paused: inMenuScreen,
