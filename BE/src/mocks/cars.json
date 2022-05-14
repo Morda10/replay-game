@@ -1,0 +1,16 @@
+[
+	{
+		"id": 1,
+		"carName": "Skoda",
+		"price": 200000,
+		"year": 2022,
+		"description": "Compact car"
+	},
+	{
+		"id": 2,
+		"carName": "Ferari",
+		"price": 150000,
+		"year": 2020,
+		"description": "Sport car"
+	}
+]
