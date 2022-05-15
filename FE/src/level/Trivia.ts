@@ -5,12 +5,14 @@ export type TriviaProps = {
 	playerNumber: number;
 	showTrivia?: boolean;
 };
+const triviaOpacity = 0.4;
 
 const renderAnswers = (answers: string[]) => {
 	return answers.map((answer: string, index: number) => {
 		return t.text({
 			color: 'white',
 			font: { weight: 'bold', size: 15 },
+			opacity: triviaOpacity,
 			text: answer,
 			x: 250,
 			y: (index - 2) * 20
@@ -23,6 +25,7 @@ const renderAnswerNumbers = (answers: string[]) => {
 		return t.text({
 			color: 'cyan',
 			font: { weight: 'bold', size: 15 },
+			opacity: triviaOpacity,
 			text: (index + 1).toString(),
 			x: 200,
 			y: (index - 2) * 20

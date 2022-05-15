@@ -6,7 +6,7 @@ import { Floor, FloorT } from "./Environment/floor";
 import { Platform, PlatformT } from "./Environment/platform";
 import { Trap, TrapT } from "./Environment/trap";
 import { Door, DoorT } from "./Environment/door";
-import { Player } from "./Player/Player";
+import { Anims, Player, playerJumpCol, playerWalkCol } from "./Player/Player";
 import { Trivia } from "./Trivia";
 import questions from "../../assets/data/triviaQuestions.json"
 import { audioEnums, audioFileNames } from "../index";
@@ -14,7 +14,6 @@ import { Box, BoxT } from "./Environment/box";
 
 
 type PlayerState = {
-	isDead: boolean;
 	playerY: number;
 	playerX: number;
 	playerGravity: number;
@@ -22,6 +21,9 @@ type PlayerState = {
 	isFlippedImg: boolean;
 	jumpY: number;
 	showTrivia: boolean;
+	playerImg: Anims;
+	flippedImgImg: Anims;
+	isDead: boolean;
 	visitedQuestions: boolean[];
 };
 
@@ -37,6 +39,13 @@ type LevelState = {
 
 type LevelProps = {
 	paused: boolean;
+};
+
+const playerAnims = {
+	walk: { anim: "Dude_Monster_Walk_6.png", col: playerWalkCol },
+	walkFlipped: { anim: "Dude_Monster_Walk_flip.png", col: playerWalkCol },
+	jump: { anim: "Dude_Monster_Jump_8.png", col: playerJumpCol },
+	jumpFlipped: { anim: "Dude_Monster_Jump_8.png", col: playerJumpCol }
 };
 
 export const KEYS = {
@@ -80,7 +89,9 @@ const handlePlayerBounds = (playerX: number, playerY: number) => {
 
 const playerMovement = (playerState: PlayerState, getInputs: () => WebInputs, floors: FloorT[], platforms: PlatformT[], isPlayer2?: boolean) => {
 	const inputs = getInputs();
-	let { playerGravity, playerY, playerX, isFlippedImg, jumpForce, jumpY, showTrivia, isDead, visitedQuestions } = playerState;
+	let {
+		playerGravity, playerY, playerX, isFlippedImg, jumpForce, jumpY, showTrivia, playerImg, flippedImgImg, isDead, visitedQuestions
+	} = playerState;
 
 	if (isPlayer2 ? inputs.keysDown[KEYS.KeyA] : inputs.keysDown[KEYS.ArrowLeft]) {
 		playerX -= 2;
@@ -96,10 +107,14 @@ const playerMovement = (playerState: PlayerState, getInputs: () => WebInputs, fl
 		if (isGrounded) {
 			jumpForce = -10;
 			jumpY = playerY;
+			playerImg = playerAnims.jump;
+			flippedImgImg = playerAnims.jump;
 		}
 	}
 	if (playerY >= jumpY + 50) {
 		jumpForce = 0;
+		playerImg = playerAnims.walk;
+		flippedImgImg = playerAnims.walkFlipped;
 	}
 
 
@@ -122,9 +137,11 @@ const playerMovement = (playerState: PlayerState, getInputs: () => WebInputs, fl
 		jumpForce,
 		playerY,
 		playerX,
+		isDead,
 		isFlippedImg,
 		showTrivia,
-		isDead,
+		playerImg,
+		flippedImgImg,
 		visitedQuestions
 	};
 };
@@ -153,9 +170,11 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
 				jumpForce: 0,
 				playerRot: 0,
 				isFlippedImg: false,
-				isDead: false,
+				flippedImgImg: playerAnims.walkFlipped,
+				playerImg: playerAnims.walk,
 				showTrivia: false,
-				visitedQuestions: [false, false, false, false, false]
+				visitedQuestions: [false, false, false, false, false],
+				isDead: false
 
 			},
 			player2: {
@@ -168,6 +187,8 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
 				isFlippedImg: false,
 				showTrivia: false,
 				visitedQuestions: [false, false, false, false, false],
+				flippedImgImg: playerAnims.walkFlipped,
+				playerImg: playerAnims.walk,
 				isDead: false
 			},
 			floors: [
@@ -404,6 +425,10 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
 		if (props.paused) {
 			return state;
 		}
+		const inputs = getInputs();
+		if (inputs.pointer.justPressed) {
+			device.audio(audioFileNames[audioEnums.mario]).play();
+		}
 		const { player: playerState, player2: playerState2, floors, platforms, doors, traps, boxes } = state;
 		const showTrivia = renderPlayer1Trivia(0, getInputs);
 		const player = playerMovement(playerState, getInputs, floors, platforms);
@@ -418,6 +443,11 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
 			deadSound.setVolume(0.1);
 			deadSound.play();
 			console.log("Trap!")
+		} else {
+			if (player.playerY < -200) {
+				const deadSound = device.audio(audioFileNames[audioEnums.dead]);
+				deadSound.pause();
+			}
 		}
 		if (isTouchingDoor(player.playerY, player.playerX, doors)) {
 			console.log("Door!")
@@ -480,18 +510,20 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
 				x: state.player.playerX,
 				y: state.player.playerY,
 				isPlayer2: false,
-				playerImg: "Dude_Monster_Walk_6.png",
-				flippedPlayerImg: "Dude_Monster_Walk_flip.png",
-				jumpImg: "Dude_Monster_Jump_8.png"
+				playerImg: state.player.playerImg,
+				flippedPlayerImg: state.player.flippedImgImg,
+				jumpImg: playerAnims.jump.anim,
+				animCol: state.player2.playerImg.col
 			}),
 			Player({
 				id: "player2",
 				x: state.player2.playerX,
 				y: state.player2.playerY,
 				isPlayer2: true,
-				playerImg: "flipped-pink-player2.png",
-				flippedPlayerImg: "Pink_Monster2.png",
-				jumpImg: "Dude_Monster_Jump_8.png"
+				playerImg: state.player2.playerImg,
+				flippedPlayerImg: state.player2.flippedImgImg,
+				jumpImg: playerAnims.jump.anim,
+				animCol: state.player2.playerImg.col
 			}),
 			playerState.showTrivia ? Trivia({
 				id: "menu1",
