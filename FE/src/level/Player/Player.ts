@@ -21,7 +21,6 @@ const playPlayerSounds = (inputs: WebInputs, { audio }: Device) => {
   if (inputs.keysJustPressed[KEYS.ArrowUp] || inputs.keysJustPressed[KEYS.KeyW]) {
     const a = audio(audioFileNames[audioEnums.jump]);
     a.setVolume(0.1);
-    console.log(a.getVolume());
     a.play();
   }
 }

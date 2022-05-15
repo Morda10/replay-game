@@ -12,6 +12,7 @@ type PlayerState = {
     playerY: number;
     playerX: number;
     playerGravity: number;
+    jumpForce: number;
     isFlippedImg: boolean;
 };
 
@@ -49,7 +50,7 @@ const handlePlayerBounds = (playerX: number, playerY: number) => {
     if (playerX > PLAYER_BOUNDS.x) newX = PLAYER_BOUNDS.x;
     if (playerX < -PLAYER_BOUNDS.negX) newX = -PLAYER_BOUNDS.negX;
     if (playerY > PLAYER_BOUNDS.y) newY = PLAYER_BOUNDS.y;
-    //if (playerY < -PLAYER_BOUNDS.negY) newY = -PLAYER_BOUNDS.negY;
+    // if (playerY < -PLAYER_BOUNDS.negY) newY = -PLAYER_BOUNDS.negY;
 
     return {
         newX,
@@ -57,39 +58,47 @@ const handlePlayerBounds = (playerX: number, playerY: number) => {
     };
 };
 
-const playerMovement = (playerState: PlayerState, getInputs: () => WebInputs, isPlayer2?: boolean) => {
+const playerMovement = (playerState: PlayerState, getInputs: () => WebInputs, floors: FloorT[], platforms: PlatformT[], isPlayer2?: boolean) => {
     const inputs = getInputs();
-    let { playerGravity, playerY, playerX, isFlippedImg } = playerState;
-
-    playerY -= playerGravity;
+    let { playerGravity, playerY, playerX, isFlippedImg, jumpForce } = playerState;
 
     if (isPlayer2 ? inputs.keysDown[KEYS.KeyA] :  inputs.keysDown[KEYS.ArrowLeft]) {
         playerX -= 2;
         isFlippedImg = true;
-
     }
     if (isPlayer2 ? inputs.keysDown[KEYS.KeyD] : inputs.keysDown[KEYS.ArrowRight]) {
         playerX += 2;
         isFlippedImg = false;
-
     }
+    const isGrounded = isStandingFloor(playerY, playerX, floors, platforms);
+
     if (isPlayer2 ? inputs.keysJustPressed[KEYS.KeyW] : inputs.keysJustPressed[KEYS.ArrowUp]) {
-        playerGravity = -10;
+        if (isGrounded) {
+            jumpForce = -10;
+        }
     }
     if (playerY >= 60) {
-        playerGravity = 6;
+        jumpForce = 0;
     }
-    // if (playerY <= 0) {
-    //     playerY = 0;
-    // }
+
+
+    if(isGrounded)
+    {
+        playerGravity = 0;
+    } else {
+        playerGravity = 4;
+    }
+    console.log(playerGravity, isGrounded);
 
     const { newX, newY } = handlePlayerBounds(playerX, playerY);
     playerX = newX;
     playerY = newY;
 
+    playerY -= playerGravity + jumpForce;
 
     return {
         playerGravity,
+        jumpForce,
         playerY,
         playerX,
         isFlippedImg
@@ -104,6 +113,7 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
                 playerY: 0,
                 playerX: 0,
                 playerGravity: 6,
+                jumpForce: 0,
                 playerRot: 0,
                 isFlippedImg: false,
             },
@@ -111,6 +121,7 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
                 playerY: 0,
                 playerX: -20,
                 playerGravity: 6,
+                jumpForce: 0,
                 playerRot: 0,
                 isFlippedImg: false
             },
@@ -148,15 +159,10 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
         if (props.paused) {
             return state;
         }
-
         const { player: playerState, player2: playerState2 , floors, platforms} = state;
-        const player  = playerMovement(playerState, getInputs);
-        const player2  = playerMovement(playerState2, getInputs, true);
-        if(isStandingFloor(player.playerY,player.playerX,floors,platforms))
-        {
-            playerState.playerY = 0;
-        }
-        //console.log(isStandingFloor(player.playerY,player.playerX,floors,platforms))
+        const player  = playerMovement(playerState, getInputs, floors, platforms);
+        const player2  = playerMovement(playerState2, getInputs, floors, platforms, true);
+
         return {
             player,
             player2,
@@ -239,17 +245,16 @@ function newDoor(x: number, y: number): DoorT {
 }
 function isStandingFloor(playerY: number,playerX: number,floors: FloorT[], platforms: PlatformT[]) {
     const actualPlayerX = playerX -250;
-    const actualPlayerY = playerY -157;
-    console.log(actualPlayerY);
+    const actualPlayerY = playerY -157 - (playerHeight / 2);
     for (const platform of platforms) {
         const platformWidthDivided = (platform.isWide?widePlatformWidth:platformWidth)/2
-        if (actualPlayerY - (playerHeight/2) >= platform.y-(platformHeight/2) && (actualPlayerX < platform.x + platformWidthDivided && actualPlayerX > platform.x - platformWidthDivided)) {
+        if (actualPlayerY >= platform.y-(platformHeight/2) && (actualPlayerX < platform.x + platformWidthDivided && actualPlayerX > platform.x - platformWidthDivided)) {
             // standing on a platform
             return true
         }
     }
     for (const floor of floors) {
-        if (actualPlayerY -(playerHeight/2) <= -185 && (actualPlayerX > floor.x - (floorWidth/2) && actualPlayerX < floor.x + (floorWidth/2))) {
+        if (actualPlayerY <= (-185 + (floorHeight / 2)) && (actualPlayerX > floor.x - (floorWidth/2) && actualPlayerX < floor.x + (floorWidth/2))) {
             // standing on a floor (floor y is -185)
             return true
         }
@@ -261,4 +266,5 @@ export const playerHeight = 24;
 export const floorWidth = 80;
 export const widePlatformWidth = 48;
 export const platformWidth = 16;
+export const floorHeight = 32;
 
