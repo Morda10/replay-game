@@ -42,12 +42,16 @@ export enum audioEnums {
 export const audioFileNames = [
   "boop.wav", "jump.wav"
 ];
+export const imgFileNames = [
+  "icon.png", "Pink_Monster.png", "flipped-pink-player.png", "Pink_Monster2.png", "flipped-pink-player2.png", "Dude_Monster_Jump_8.png", "Dude_Monster_Walk_flip.png", "Dude_Monster_Walk_6.png",
+  "menu.png", "Trap.png", "floor.png", "platform.png", "wide_platform.png", "door_closed.png"
+];
 
 export const Game = makeSprite<GameProps, GameState, WebInputs | iOSInputs>({
   init({ updateState, preloadFiles }) {
     preloadFiles({
       audioFileNames: audioFileNames,
-      imageFileNames: ["Dude_Monster_Jump_8.png", "Dude_Monster_Walk_flip.png", "Dude_Monster_Walk_6.png", "icon.png", "Pink_Monster.png", "flipped-pink-player.png", "Pink_Monster2.png", "flipped-pink-player2.png", "floor.png", "platform.png", "wide_platform.png", "Trap.png", "door_opened.png", "door_closed.png"],
+      imageFileNames: imgFileNames,
     }).then(() => {
       updateState((state) => ({ ...state, loaded: true }));
     });

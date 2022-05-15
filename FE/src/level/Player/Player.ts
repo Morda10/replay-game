@@ -4,8 +4,8 @@ import { iOSInputs } from "@replay/swift";
 import { KEYS } from "../Level";
 import { audioEnums, audioFileNames } from "../../index";
 
-export const playerWidth = 32;
-export const playerHeight = 32;
+export const playerWidth = 24;
+export const playerHeight = 24;
 
 export type PlayerProps = {
   isPlayer2: boolean;
@@ -25,7 +25,6 @@ const playPlayerSounds = (inputs: WebInputs, { audio }: Device) => {
   if (inputs.keysJustPressed[KEYS.ArrowUp] || inputs.keysJustPressed[KEYS.KeyW]) {
     const a = audio(audioFileNames[audioEnums.jump]);
     a.setVolume(0.1);
-    console.log(a.getVolume());
     a.play();
   }
 }
@@ -90,7 +89,7 @@ export const Player = makeSprite<PlayerProps, PlayerState, WebInputs | iOSInputs
       index: state.isJump ? Math.round(state.frame) : 0,
       width: playerWidth,
       height: playerHeight,
-      y: -150,
+      y: -157,
       x: -250
     }),
     t.spriteSheet({
@@ -100,7 +99,7 @@ export const Player = makeSprite<PlayerProps, PlayerState, WebInputs | iOSInputs
       index: state.isMoving ? Math.round(state.frame) : 0,
       width: playerWidth,
       height: playerHeight,
-      y: -150,
+      y: -157,
       x: -250
     }),
 

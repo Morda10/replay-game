@@ -1,4 +1,5 @@
 import { makeSprite, t } from "@replay/core";
+import { trapHeight, trapWidth } from "../Level";
 
 export type TrapT = {
   x: number;
@@ -14,7 +15,7 @@ export const Trap = makeSprite<TrapProps>({
     const { trap } = props;
     return [
       t.image({
-        height: 20, width: 22,
+        height: trapHeight, width: trapWidth,
         fileName: "Trap.png",
         x: trap.x,
         y: trap.y
