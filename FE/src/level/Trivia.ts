@@ -3,6 +3,7 @@ import questions from "../../assets/data/triviaQuestions.json"
 
 export type TriviaProps = {
 	playerNumber: number;
+	showTrivia?: boolean;
 };
 
 const renderAnswers = (answers: string[]) => {
@@ -31,34 +32,34 @@ const renderAnswerNumbers = (answers: string[]) => {
 
 export const Trivia = makeSprite<TriviaProps>({
 	render({ props }) {
-		const { playerNumber } = props;
+		const { playerNumber, showTrivia } = props;
 		const randomQuestionNumber = 0;
 		// const randomQuestionNumber = Math.floor(Math.random() * 5);
-
-		return [
-			t.text({
-				color: 'yellow',
-				text: questions.playerOneQuestions[randomQuestionNumber].question,
-				font: { weight: 'bold', size: 15 },
-				x: 250,
-				y: 58
-			}),
-			...renderAnswers(questions.playerOneQuestions[randomQuestionNumber].answers),
-			...renderAnswerNumbers(questions.playerOneQuestions[randomQuestionNumber].answers),
-			t.text({
-				color: 'yellow',
-				text: "בחר תשובה עם מספרי המקלדת",
-				font: { weight: 'bold', size: 12 },
-				x: 250,
-				y: -80
-			}),
-			t.image({
-				fileName: "menu.png",
-				width: 250,
-				height: 250,
-				x: playerNumber === 0 ? 250 : -250,
-				opacity: 1
-			})
-		];
+		return showTrivia ?
+			[
+				t.text({
+					color: 'yellow',
+					text: questions.playerOneQuestions[randomQuestionNumber].question,
+					font: { weight: 'bold', size: 15 },
+					x: 250,
+					y: 58
+				}),
+				...renderAnswers(questions.playerOneQuestions[randomQuestionNumber].answers),
+				...renderAnswerNumbers(questions.playerOneQuestions[randomQuestionNumber].answers),
+				t.text({
+					color: 'yellow',
+					text: "בחר תשובה עם מספרי המקלדת",
+					font: { weight: 'bold', size: 12 },
+					x: 250,
+					y: -80
+				}),
+				t.image({
+					fileName: "menu.png",
+					width: 250,
+					height: 250,
+					x: playerNumber === 0 ? 250 : -250,
+					opacity: 1
+				})
+			] : [];
 	},
 });
