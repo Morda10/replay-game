@@ -5,7 +5,7 @@ import { Floor, FloorT } from "./Environment/floor";
 import { Platform, PlatformT } from "./Environment/platform";
 import { Trap, TrapT } from "./Environment/trap";
 import { Door, DoorT } from "./Environment/door";
-import { Player } from "./Player/Player";
+import {Anims, Player, playerJumpCol, playerWalkCol} from "./Player/Player";
 import { Trivia } from "./Trivia";
 import questions from "../../assets/data/triviaQuestions.json"
 
@@ -18,6 +18,8 @@ type PlayerState = {
     isFlippedImg: boolean;
     jumpY: number;
     showTrivia: boolean;
+    playerImg: Anims;
+    flippedImgImg: Anims;
 };
 
 type LevelState = {
@@ -31,6 +33,13 @@ type LevelState = {
 
 type LevelProps = {
     paused: boolean;
+};
+
+const playerAnims = {
+    walk: { anim: "Dude_Monster_Walk_6.png", col: playerWalkCol},
+    walkFlipped: {anim: "Dude_Monster_Walk_flip.png", col: playerWalkCol},
+    jump: {anim: "Dude_Monster_Jump_8.png", col: playerJumpCol},
+    jumpFlipped: {anim: "Dude_Monster_Jump_8.png", col: playerJumpCol}
 };
 
 export const KEYS = {
@@ -74,7 +83,9 @@ const handlePlayerBounds = (playerX: number, playerY: number) => {
 
 const playerMovement = (playerState: PlayerState, getInputs: () => WebInputs, floors: FloorT[], platforms: PlatformT[], isPlayer2?: boolean) => {
     const inputs = getInputs();
-    let { playerGravity, playerY, playerX, isFlippedImg, jumpForce, jumpY, showTrivia } = playerState;
+    let {
+        playerGravity, playerY, playerX, isFlippedImg, jumpForce, jumpY, showTrivia, playerImg, flippedImgImg
+    } = playerState;
 
     if (isPlayer2 ? inputs.keysDown[KEYS.KeyA] : inputs.keysDown[KEYS.ArrowLeft]) {
         playerX -= 2;
@@ -90,10 +101,14 @@ const playerMovement = (playerState: PlayerState, getInputs: () => WebInputs, fl
         if (isGrounded) {
             jumpForce = -10;
             jumpY = playerY;
+            playerImg = playerAnims.jump;
+            flippedImgImg = playerAnims.jump;
         }
     }
     if (playerY >= jumpY + 50) {
         jumpForce = 0;
+        playerImg = playerAnims.walk;
+        flippedImgImg = playerAnims.walkFlipped;
     }
 
 
@@ -117,7 +132,9 @@ const playerMovement = (playerState: PlayerState, getInputs: () => WebInputs, fl
         playerY,
         playerX,
         isFlippedImg,
-        showTrivia
+        showTrivia,
+        playerImg,
+        flippedImgImg
     };
 };
 
@@ -145,6 +162,8 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
                 jumpForce: 0,
                 playerRot: 0,
                 isFlippedImg: false,
+                flippedImgImg: playerAnims.walkFlipped,
+                playerImg: playerAnims.walk,
                 showTrivia: true
 
             },
@@ -156,7 +175,9 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
                 jumpForce: 0,
                 playerRot: 0,
                 isFlippedImg: false,
-                showTrivia: true
+                showTrivia: true,
+                flippedImgImg: playerAnims.walkFlipped,
+                playerImg: playerAnims.walk
             },
             floors: [
                 {
@@ -426,18 +447,20 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
                 x: state.player.playerX,
                 y: state.player.playerY,
                 isPlayer2: false,
-                playerImg: "Dude_Monster_Walk_6.png",
-                flippedPlayerImg: "Dude_Monster_Walk_flip.png",
-                jumpImg: "Dude_Monster_Jump_8.png"
+                playerImg: state.player.playerImg,
+                flippedPlayerImg: state.player.flippedImgImg,
+                jumpImg: playerAnims.jump.anim,
+                animCol: state.player2.playerImg.col
             }),
             Player({
                 id: "player2",
                 x: state.player2.playerX,
                 y: state.player2.playerY,
                 isPlayer2: true,
-                playerImg: "flipped-pink-player2.png",
-                flippedPlayerImg: "Pink_Monster2.png",
-                jumpImg: "Dude_Monster_Jump_8.png"
+                playerImg: state.player2.playerImg,
+                flippedPlayerImg: state.player2.flippedImgImg,
+                jumpImg: playerAnims.jump.anim,
+                animCol: state.player2.playerImg.col
             }),
             playerState.showTrivia ? Trivia({
                 id: "menu1",

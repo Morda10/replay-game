@@ -4,12 +4,14 @@ import questions from "../../assets/data/triviaQuestions.json"
 export type TriviaProps = {
 	playerNumber: number;
 };
+const triviaOpacity = 0.4;
 
 const renderAnswers = (answers: string[]) => {
 	return answers.map((answer: string, index: number) => {
 		return t.text({
 			color: 'white',
 			font: { weight: 'bold', size: 15 },
+			opacity: triviaOpacity,
 			text: answer,
 			x: 250,
 			y: (index - 2) * 20
@@ -22,6 +24,7 @@ const renderAnswerNumbers = (answers: string[]) => {
 		return t.text({
 			color: 'cyan',
 			font: { weight: 'bold', size: 15 },
+			opacity: triviaOpacity,
 			text: (index + 1).toString(),
 			x: 200,
 			y: (index - 2) * 20
@@ -40,6 +43,7 @@ export const Trivia = makeSprite<TriviaProps>({
 				color: 'yellow',
 				text: questions.playerOneQuestions[randomQuestionNumber].question,
 				font: { weight: 'bold', size: 15 },
+				opacity: triviaOpacity,
 				x: 250,
 				y: 58
 			}),
@@ -49,6 +53,7 @@ export const Trivia = makeSprite<TriviaProps>({
 				color: 'yellow',
 				text: "בחר תשובה עם מספרי המקלדת",
 				font: { weight: 'bold', size: 12 },
+				opacity: triviaOpacity,
 				x: 250,
 				y: -80
 			}),
@@ -57,7 +62,7 @@ export const Trivia = makeSprite<TriviaProps>({
 				width: 250,
 				height: 250,
 				x: playerNumber === 0 ? 250 : -250,
-				opacity: 1
+				opacity: triviaOpacity
 			})
 		];
 	},

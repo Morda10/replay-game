@@ -7,11 +7,14 @@ import { audioEnums, audioFileNames } from "../../index";
 export const playerWidth = 24;
 export const playerHeight = 24;
 
+export type Anims = { anim: string, col: number }
+
 export type PlayerProps = {
   isPlayer2: boolean;
-  playerImg: string;
+  playerImg: Anims;
   jumpImg: string;
-  flippedPlayerImg: string;
+  flippedPlayerImg: Anims;
+  animCol: number;
 };
 
 type PlayerState = {
@@ -66,7 +69,7 @@ export const Player = makeSprite<PlayerProps, PlayerState, WebInputs | iOSInputs
 
     const { isFlippedImg, isMoving } = handlePlayerFlipping(inputs, state, device, props);
     playPlayerSounds(inputs, device);
-    const newFrame = state.frame + 0.4;
+    const newFrame = state.frame + (1/6);
 
     let isPlayerJump = false
     if (inputs.keysDown[KEYS.ArrowUp]) {
@@ -81,20 +84,11 @@ export const Player = makeSprite<PlayerProps, PlayerState, WebInputs | iOSInputs
     };
   },
   render({ props, state }) {
-    const { playerImg, flippedPlayerImg, jumpImg } = props;
-    return [t.spriteSheet({
-      fileName: state.isJump ? jumpImg : playerImg,
-      columns: 8,
-      rows: 1,
-      index: state.isJump ? Math.round(state.frame) : 0,
-      width: playerWidth,
-      height: playerHeight,
-      y: -157,
-      x: -250
-    }),
+    const { playerImg, flippedPlayerImg } = props;
+    return [
     t.spriteSheet({
-      fileName: state.isFlippedImg ? flippedPlayerImg : playerImg,
-      columns: 6,
+      fileName: state.isFlippedImg ? flippedPlayerImg.anim : playerImg.anim,
+      columns: playerImg.col,
       rows: 1,
       index: state.isMoving ? Math.round(state.frame) : 0,
       width: playerWidth,
@@ -106,3 +100,6 @@ export const Player = makeSprite<PlayerProps, PlayerState, WebInputs | iOSInputs
     ];
   },
 });
+
+export const playerWalkCol = 6;
+export const playerJumpCol = 8;
