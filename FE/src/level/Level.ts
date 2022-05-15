@@ -116,11 +116,15 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
                 playerRot: 0,
                 isFlippedImg: false
             },
-            floors:[{
+            floors:[
+                {
+                    x: -370
+                },
+                {
                     x: -60
                     },
                     {
-                    x: -240
+                    x: -260
                     },
                 {
                     x: 20
@@ -128,8 +132,32 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
                 {
                     x: 100
                 },
+                {
+                    x: 370
+                },
             ],
-            platforms:[{
+            platforms:[
+                {
+                    x: -220,
+                    y: -120,
+                    isWide: false
+                },
+                {
+                    x: -245,
+                    y: -95,
+                    isWide: false
+                },
+                {
+                    x: -270,
+                    y: -70,
+                    isWide: false
+                },
+                {
+                    x: -310,
+                    y: -50,
+                    isWide: true
+                },
+                {
                 x: -80,
                 y: -130,
                 isWide: false
@@ -140,9 +168,34 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
                     isWide: false
                 },
                 {
-                    x: -20,
+                    x: -135,
+                    y: -120,
+                    isWide: false
+                },
+                {
+                    x: 45,
                     y: -90,
                     isWide: false
+                },
+                {
+                    x: 130,
+                    y: -60,
+                    isWide: false
+                },
+                {
+                    x: 155,
+                    y: -50,
+                    isWide: false
+                },
+                {
+                    x: 90,
+                    y: -80,
+                    isWide: true
+                },
+                {
+                    x: -180,
+                    y: -140,
+                    isWide: true
                 },
                 {
                     x: 10,
@@ -165,11 +218,36 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
                     y: -27,
                     open:false
                 },
+                {
+                    x: -310,
+                    y: -37,
+                    open:false
+                },
             ],
             traps:[{
                 x: -110,
                 y: -190,
             },
+                {
+                    x: -132,
+                    y: -190,
+                },
+                {
+                    x: -154,
+                    y: -190,
+                },
+                {
+                    x: -176,
+                    y: -190,
+                },
+                {
+                    x: -198,
+                    y: -190,
+                },
+                {
+                    x: -220,
+                    y: -190,
+                },
                 {
                     x: 150,
                     y: -190,
