@@ -450,6 +450,7 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
 			}
 		}
 		if (isTouchingDoor(player.playerY, player.playerX, doors)) {
+			player.showTrivia= true;
 			console.log("Door!")
 		}
 		if (isTouchingBox(player.playerY, player.playerX, boxes)) {
