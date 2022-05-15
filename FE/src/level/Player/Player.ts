@@ -1,19 +1,20 @@
 import { makeSprite, t } from "@replay/core";
 import { WebInputs } from "@replay/web";
 import { iOSInputs } from "@replay/swift";
+import { KEYS } from "../Level";
 
-export const birdWidth = 50;
-export const birdHeight = 40;
+export const playerWidth = 50;
+export const playerHeight = 40;
 
-export type BirdProps = {
+export type PlayerProps = {
   isFlippedImg: boolean;
 };
 
-type BirdState = {
+type PlayerState = {
   isFlippedImg: boolean;
 };
 
-export const Bird = makeSprite<BirdProps, BirdState, WebInputs | iOSInputs>({
+export const Player = makeSprite<PlayerProps, PlayerState, WebInputs | iOSInputs>({
   init() {
     return {
       isFlippedImg: false
@@ -24,11 +25,11 @@ export const Bird = makeSprite<BirdProps, BirdState, WebInputs | iOSInputs>({
     let { isFlippedImg } = state;
 
 
-    if (inputs.keysDown["ArrowLeft"]) {
+    if (inputs.keysDown[KEYS.ArrowLeft]) {
       isFlippedImg = true;
 
     }
-    if (inputs.keysDown["ArrowRight"]) {
+    if (inputs.keysDown[KEYS.ArrowRight]) {
 
       isFlippedImg = false;
 
@@ -42,8 +43,10 @@ export const Bird = makeSprite<BirdProps, BirdState, WebInputs | iOSInputs>({
     return [
       t.image({
         fileName: state.isFlippedImg ? "flipped-pink-player.png" : "Pink_Monster.png",
-        width: birdWidth,
-        height: birdHeight
+        width: playerWidth,
+        height: playerHeight,
+        y: 0,
+        x: 0
       }),
     ];
   },
