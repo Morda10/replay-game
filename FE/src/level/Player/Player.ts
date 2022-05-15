@@ -4,8 +4,8 @@ import { iOSInputs } from "@replay/swift";
 import { KEYS } from "../Level";
 import {audioEnums, audioFileNames} from "../../index";
 
-export const playerWidth = 50;
-export const playerHeight = 40;
+export const playerWidth = 24;
+export const playerHeight = 24;
 
 export type PlayerProps = {
   isPlayer2: boolean;
@@ -17,9 +17,12 @@ type PlayerState = {
   isFlippedImg: boolean;
 };
 
-const playPlayerSounds = (inputs: WebInputs, device: Device) => {
-  if (inputs.keysDown[KEYS.ArrowUp] || inputs.keysDown[KEYS.KeyW]) {
-    device.audio(audioFileNames[audioEnums.jump]).play();
+const playPlayerSounds = (inputs: WebInputs, { audio }: Device) => {
+  if (inputs.keysJustPressed[KEYS.ArrowUp] || inputs.keysJustPressed[KEYS.KeyW]) {
+    const a = audio(audioFileNames[audioEnums.jump]);
+    a.setVolume(0.1);
+    console.log(a.getVolume());
+    a.play();
   }
 }
 
@@ -60,7 +63,7 @@ export const Player = makeSprite<PlayerProps, PlayerState, WebInputs | iOSInputs
         fileName: state.isFlippedImg ? playerImg : flippedPlayerImg,
         width: playerWidth,
         height: playerHeight,
-        y: -150,
+        y: -157,
         x: -250
       }),
     ];
