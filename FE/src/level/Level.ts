@@ -20,6 +20,8 @@ type LevelState = {
     player2: PlayerState;
     floors: FloorT[];
     platforms: PlatformT[];
+    doors: DoorT[];
+    traps: TrapT[];
 };
 
 type LevelProps = {
@@ -49,7 +51,7 @@ const handlePlayerBounds = (playerX: number, playerY: number) => {
     if (playerX > PLAYER_BOUNDS.x) newX = PLAYER_BOUNDS.x;
     if (playerX < -PLAYER_BOUNDS.negX) newX = -PLAYER_BOUNDS.negX;
     if (playerY > PLAYER_BOUNDS.y) newY = PLAYER_BOUNDS.y;
-    //if (playerY < -PLAYER_BOUNDS.negY) newY = -PLAYER_BOUNDS.negY;
+    if ( playerY < -PLAYER_BOUNDS.negY) newY = -PLAYER_BOUNDS.negY;
 
     return {
         newX,
@@ -120,6 +122,12 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
                     {
                     x: -240
                     },
+                {
+                    x: 20
+                },
+                {
+                    x: 100
+                },
             ],
             platforms:[{
                 x: -80,
@@ -141,7 +149,44 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
                     y: -130,
                     isWide: true
                 },
-            ]
+                {
+                    x: 200,
+                    y: -40,
+                    isWide: true
+                },
+            ],
+            doors:[{
+                x: 10,
+                y: -117,
+                open:false
+            },
+                {
+                    x: 200,
+                    y: -27,
+                    open:false
+                },
+            ],
+            traps:[{
+                x: -110,
+                y: -190,
+            },
+                {
+                    x: 150,
+                    y: -190,
+                },
+                {
+                    x: 172,
+                    y: -190,
+                },
+                {
+                    x: 194,
+                    y: -190,
+                },
+                {
+                    x: 216,
+                    y: -175,
+                },
+            ],
         };
     },
     loop({ props, state, getInputs }) {
@@ -149,19 +194,28 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
             return state;
         }
 
-        const { player: playerState, player2: playerState2 , floors, platforms} = state;
+        const { player: playerState, player2: playerState2 , floors, platforms, doors, traps} = state;
         const player  = playerMovement(playerState, getInputs);
         const player2  = playerMovement(playerState2, getInputs, true);
         if(isStandingFloor(player.playerY,player.playerX,floors,platforms))
         {
             playerState.playerY = 0;
         }
-        //console.log(isStandingFloor(player.playerY,player.playerX,floors,platforms))
+        if(isTouchingTrap(player.playerY,player.playerX,traps))
+        {
+            console.log("Trap!")
+        }
+        if(isTouchingDoor(player.playerY,player.playerX,doors))
+        {
+            console.log("Door!")
+        }
         return {
             player,
             player2,
             floors,
-            platforms
+            platforms,
+            doors,
+            traps
         };
     },
     render({ state, device }) {
@@ -172,14 +226,12 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
                 width: size.width + size.widthMargin * 2,
                 height: size.height + size.heightMargin * 2,
             }),
-            Trap({
-                trap: newTrap(-110, -190),
-                id: "trap"
-            }),
-            Door({
-                door: newDoor(10, -85),
-                id: "door"
-            }),
+            ...state.traps.map((trap, index) =>
+              Trap({
+                  id: `trap-${index}`,
+                  trap: newTrap(trap.x, trap.y),
+              })
+            ),
             ...state.floors.map((floor, index) =>
               Floor({
                   id: `floor-${index}`,
@@ -190,6 +242,12 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
               Platform({
                   id: `platform-${index}`,
                   platform: newPlatform(platform.x, platform.y, platform.isWide),
+              })
+            ),
+            ...state.doors.map((door, index) =>
+              Door({
+                  id: `door-${index}`,
+                  door: newDoor(door.x, door.y),
               })
             ),
             Player({
@@ -240,7 +298,6 @@ function newDoor(x: number, y: number): DoorT {
 function isStandingFloor(playerY: number,playerX: number,floors: FloorT[], platforms: PlatformT[]) {
     const actualPlayerX = playerX -250;
     const actualPlayerY = playerY -157;
-    console.log(actualPlayerY);
     for (const platform of platforms) {
         const platformWidthDivided = (platform.isWide?widePlatformWidth:platformWidth)/2
         if (actualPlayerY - (playerHeight/2) >= platform.y-(platformHeight/2) && (actualPlayerX < platform.x + platformWidthDivided && actualPlayerX > platform.x - platformWidthDivided)) {
@@ -256,9 +313,37 @@ function isStandingFloor(playerY: number,playerX: number,floors: FloorT[], platf
     }
     return false
 }
+function isTouchingDoor(playerY: number,playerX: number,doors: DoorT[]) {
+    const actualPlayerX = playerX -250;
+    const actualPlayerY = playerY -157;
+    for (const door of doors) {
+        const doorWidthDivided = doorWidth/2
+        if (actualPlayerY - (playerHeight/2) >= door.y-(platformHeight/2) && (actualPlayerX < door.x + doorWidthDivided && actualPlayerX > door.x - doorWidthDivided)) {
+            // standing on a platform
+            return true
+        }
+    }
+    return false
+}
+function isTouchingTrap(playerY: number,playerX: number,traps: TrapT[]) {
+    const actualPlayerX = playerX -250;
+    const actualPlayerY = playerY -157;
+    for (const trap of traps) {
+        const trapWidthDivided = trapWidth/2
+        if (actualPlayerY - (playerHeight/2) <= trap.y+(trapHeight/2) && (actualPlayerX < trap.x + trapWidthDivided && actualPlayerX > trap.x - trapWidthDivided)) {
+            // standing on a platform
+            return true
+        }
+    }
+    return false
+}
+
 export const platformHeight = 12;
 export const playerHeight = 24;
 export const floorWidth = 80;
 export const widePlatformWidth = 48;
 export const platformWidth = 16;
+export const doorWidth = 12;
+export const trapWidth = 22;
+export const trapHeight = 20;
 
