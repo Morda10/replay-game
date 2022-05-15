@@ -74,7 +74,7 @@ const handlePlayerBounds = (playerX: number, playerY: number) => {
 
 const playerMovement = (playerState: PlayerState, getInputs: () => WebInputs, floors: FloorT[], platforms: PlatformT[], isPlayer2?: boolean) => {
     const inputs = getInputs();
-    let { playerGravity, playerY, playerX, isFlippedImg, jumpForce, jumpY } = playerState;
+    let { playerGravity, playerY, playerX, isFlippedImg, jumpForce, jumpY, showTrivia } = playerState;
 
     if (isPlayer2 ? inputs.keysDown[KEYS.KeyA] :  inputs.keysDown[KEYS.ArrowLeft]) {
         playerX -= 2;
@@ -146,6 +146,7 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
                 jumpForce: 0,
                 playerRot: 0,
                 isFlippedImg: false,
+                showTrivia: true
 
             },
             player2: {
@@ -316,8 +317,8 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
 
         const { player: playerState, player2: playerState2 , floors, platforms, doors, traps} = state;
         const showTrivia = renderPlayer1Trivia(0, getInputs);
-        const player  = playerMovement(playerState, getInputs);
-        const player2  = playerMovement(playerState2, getInputs, true);
+        const player  = playerMovement(playerState, getInputs, floors, platforms);
+        const player2  = playerMovement(playerState2, getInputs, floors, platforms, true);
         player.showTrivia = showTrivia;
         if(isStandingFloor(player.playerY,player.playerX,floors,platforms))
         {
