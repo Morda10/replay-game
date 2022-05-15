@@ -1,17 +1,40 @@
-import { makeSprite, t } from "@replay/core";
+import {Device, makeSprite, t} from "@replay/core";
 import { WebInputs } from "@replay/web";
 import { iOSInputs } from "@replay/swift";
 import { KEYS } from "../Level";
+import {audioEnums, audioFileNames} from "../../index";
 
 export const playerWidth = 50;
 export const playerHeight = 40;
 
 export type PlayerProps = {
-  isFlippedImg: boolean;
+  isPlayer2: boolean;
+  playerImg: string;
+  flippedPlayerImg: string;
 };
 
 type PlayerState = {
   isFlippedImg: boolean;
+};
+
+const playPlayerSounds = (inputs: WebInputs, device: Device) => {
+  if (inputs.keysDown[KEYS.ArrowUp] || inputs.keysDown[KEYS.KeyW]) {
+    device.audio(audioFileNames[audioEnums.jump]).play();
+  }
+}
+
+const handlePlayerFlipping = (inputs: WebInputs, state:  Readonly<PlayerState>, device: Device, props: Readonly<PlayerProps>) => {
+  let { isFlippedImg } = state;
+  const { isPlayer2 } = props;
+  const leftKey = !isPlayer2 ? inputs.keysDown[KEYS.ArrowLeft] : inputs.keysDown[KEYS.KeyA];
+  const rightKey = !isPlayer2 ? inputs.keysDown[KEYS.ArrowRight] : inputs.keysDown[KEYS.KeyD];
+  if (leftKey) {
+    isFlippedImg = true;
+  }
+  if (rightKey) {
+    isFlippedImg = false;
+  }
+  return isFlippedImg;
 };
 
 export const Player = makeSprite<PlayerProps, PlayerState, WebInputs | iOSInputs>({
@@ -20,33 +43,25 @@ export const Player = makeSprite<PlayerProps, PlayerState, WebInputs | iOSInputs
       isFlippedImg: false
     };
   },
-  loop({ state, getInputs }) {
+  loop({ props, state, getInputs, device }) {
     const inputs = getInputs();
-    let { isFlippedImg } = state;
 
-
-    if (inputs.keysDown[KEYS.ArrowLeft]) {
-      isFlippedImg = true;
-
-    }
-    if (inputs.keysDown[KEYS.ArrowRight]) {
-
-      isFlippedImg = false;
-
-    }
+    const isFlippedImg = handlePlayerFlipping(inputs, state, device, props);
+    playPlayerSounds(inputs, device);
 
     return {
       isFlippedImg
     };
   },
-  render({ state }) {
+  render({ props, state }) {
+    const { playerImg, flippedPlayerImg } = props;
     return [
       t.image({
-        fileName: state.isFlippedImg ? "flipped-pink-player.png" : "Pink_Monster.png",
+        fileName: state.isFlippedImg ? playerImg : flippedPlayerImg,
         width: playerWidth,
         height: playerHeight,
-        y: 0,
-        x: 0
+        y: -150,
+        x: -250
       }),
     ];
   },

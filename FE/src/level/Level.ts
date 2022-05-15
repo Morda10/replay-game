@@ -29,12 +29,32 @@ export const KEYS = {
     KeyS: 's'
 };
 
+const handlePlayerBounds = (playerX: number, playerY: number) => {
+    const PLAYER_BOUNDS = {
+        x: 540,
+        y: 150,
+        negX: 40,
+        negY: 0,
+
+    };
+    let newX = playerX;
+    let newY = playerY;
+    if (playerX > PLAYER_BOUNDS.x) newX = PLAYER_BOUNDS.x;
+    if (playerX < -PLAYER_BOUNDS.negX) newX = -PLAYER_BOUNDS.negX;
+    if (playerY > PLAYER_BOUNDS.y) newY = PLAYER_BOUNDS.y;
+    if (playerY < -PLAYER_BOUNDS.negY) newY = -PLAYER_BOUNDS.negY;
+
+    return {
+        newX,
+        newY
+    };
+};
+
 const playerMovement = (playerState: PlayerState, getInputs: () => WebInputs, isPlayer2?: boolean) => {
     const inputs = getInputs();
     let { playerGravity, playerY, playerX, isFlippedImg } = playerState;
 
     playerY -= playerGravity;
-
 
     if (isPlayer2 ? inputs.keysDown[KEYS.KeyA] :  inputs.keysDown[KEYS.ArrowLeft]) {
         playerX -= 2;
@@ -56,6 +76,10 @@ const playerMovement = (playerState: PlayerState, getInputs: () => WebInputs, is
         playerY = 0;
     }
 
+    const { newX, newY } = handlePlayerBounds(playerX, playerY);
+    playerX = newX;
+    playerY = newY;
+
 
     return {
         playerGravity,
@@ -70,15 +94,15 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
     init() {
         return {
             player: {
-                playerY: 10,
+                playerY: 0,
                 playerX: 0,
                 playerGravity: 6,
                 playerRot: 0,
-                isFlippedImg: false
+                isFlippedImg: false,
             },
             player2: {
-                playerY: 10,
-                playerX: -10,
+                playerY: 0,
+                playerX: -20,
                 playerGravity: 6,
                 playerRot: 0,
                 isFlippedImg: false
@@ -89,6 +113,7 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
         if (props.paused) {
             return state;
         }
+
         const { player: playerState, player2: playerState2 } = state;
         const player  = playerMovement(playerState, getInputs);
         const player2  = playerMovement(playerState2, getInputs, true);
@@ -110,13 +135,17 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
                 id: "player",
                 x: state.player.playerX,
                 y: state.player.playerY,
-                isFlippedImg: state.player.isFlippedImg
+                isPlayer2: false,
+                playerImg: "flipped-pink-player.png",
+                flippedPlayerImg: "Pink_Monster.png"
             }),
             Player({
                 id: "player2",
                 x: state.player2.playerX,
                 y: state.player2.playerY,
-                isFlippedImg: state.player2.isFlippedImg
+                isPlayer2: true,
+                playerImg: "flipped-pink-player2.png",
+                flippedPlayerImg: "Pink_Monster2.png"
             }),
         ];
     },
