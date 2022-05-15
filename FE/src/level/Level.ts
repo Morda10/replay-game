@@ -2,6 +2,11 @@ import { makeSprite, t } from "@replay/core";
 import { WebInputs } from "@replay/web";
 import { iOSInputs } from "@replay/swift";
 import { Bird } from "../bird";
+import { Floor, FloorT } from "./Environment/floor";
+import { Platform, PlatformT } from "./Environment/platform";
+import { WidePlatform, WidePlatformT } from "./Environment/wide_platform";
+import { Trap, TrapT } from "./Environment/trap";
+import { Door, DoorT } from "./Environment/door";
 
 
 type LevelState = {
@@ -26,17 +31,14 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
             isFlippedImg: false
         };
     },
-    loop({ props, state, getInputs }) {
+    loop({ props, state, getInputs,  }) {
         const inputs = getInputs();
-        let { birdY, birdX, isFlippedImg, birdGravity } = state;
+        let { birdY, birdX, isFlippedImg, birdGravity} = state;
 
         if (props.paused) {
             return state;
         }
-
-
         birdY -= birdGravity;
-
 
         if (inputs.keysDown["ArrowLeft"]) {
             birdX -= 2;
@@ -58,7 +60,6 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
             birdY = 0;
         }
 
-
         return {
             birdGravity,
             birdY,
@@ -74,12 +75,82 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
                 width: size.width + size.widthMargin * 2,
                 height: size.height + size.heightMargin * 2,
             }),
+            Floor({
+                floor: newFloor(-160),
+                id: "floor"
+            }),
+            Floor({
+                floor: newFloor(-60),
+                id: "floor1"
+            }),
+            Trap({
+                trap: newTrap(-110, -190),
+                id: "trap"
+            }),
+            Platform({
+                platform: newPlatform(-80, -130),
+                id: "platform1"
+            }),
+            Platform({
+                platform: newPlatform(-50, -110),
+                id: "platform2"
+            }),
+            Platform({
+                platform: newPlatform(-20, -90),
+                id: "platform3"
+            }),
+            WidePlatform({
+                platform: newWidePlatform(10, -130),
+                id: "wide_platform"
+            }),
+            Door({
+                door: newDoor(10, -85),
+                id: "door"
+            }),
             Bird({
                 id: "bird",
                 x: state.birdX,
                 y: state.birdY,
                 isFlippedImg: state.isFlippedImg
             }),
+
+            // ...state.floors.map((floor, index) =>
+            //   Floor({
+            //       id: `floor-${index}`,
+            //       floor,
+            //       x: floor.x,
+            //   })
+            // ),
         ];
     },
 });
+function newFloor(x: number): FloorT {
+    return {
+        x,
+    };
+}
+function newPlatform(x: number, y: number): PlatformT {
+    return {
+        x,
+        y,
+    };
+}
+function newWidePlatform(x: number, y: number): WidePlatformT {
+    return {
+        x,
+        y,
+    };
+}
+function newTrap(x: number, y: number): TrapT {
+    return {
+        x,
+        y,
+    };
+}
+function newDoor(x: number, y: number): DoorT {
+    return {
+        x,
+        y,
+        open: false
+    };
+}
