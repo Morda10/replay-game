@@ -36,11 +36,12 @@ type GameState = {
 
 export enum audioEnums {
   boop,
-  jump
+  jump,
+  dead
 }
 
 export const audioFileNames = [
-  "boop.wav", "jump.wav"
+	"boop.wav", "jump.wav","dead.wav"
 ];
 export const imgFileNames = [
   "icon.png", "Pink_Monster.png", "flipped-pink-player.png", "Pink_Monster2.png", "flipped-pink-player2.png", "Dude_Monster_Jump_8.png", "Dude_Monster_Walk_flip.png", "Dude_Monster_Walk_6.png",
