@@ -61,7 +61,7 @@ const playerMovement = (playerState: PlayerState, getInputs: () => WebInputs, is
 
     playerY -= playerGravity;
 
-    if (isPlayer2 ? inputs.keysDown[KEYS.KeyA] :  inputs.keysDown[KEYS.ArrowLeft]) {
+    if (isPlayer2 ? inputs.keysDown[KEYS.KeyA] : inputs.keysDown[KEYS.ArrowLeft]) {
         playerX -= 2;
         isFlippedImg = true;
 
@@ -120,8 +120,8 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
         }
 
         const { player: playerState, player2: playerState2 } = state;
-        const player  = playerMovement(playerState, getInputs);
-        const player2  = playerMovement(playerState2, getInputs, true);
+        const player = playerMovement(playerState, getInputs);
+        const player2 = playerMovement(playerState2, getInputs, true);
         return {
             player,
             player2
@@ -172,8 +172,9 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
                 x: state.player.playerX,
                 y: state.player.playerY,
                 isPlayer2: false,
-                playerImg: "flipped-pink-player.png",
-                flippedPlayerImg: "Pink_Monster.png"
+                playerImg: "Dude_Monster_Walk_6.png",
+                flippedPlayerImg: "Dude_Monster_Walk_flip.png",
+                jumpImg: "Dude_Monster_Jump_8.png"
             }),
             Player({
                 id: "player2",
@@ -181,7 +182,8 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
                 y: state.player2.playerY,
                 isPlayer2: true,
                 playerImg: "flipped-pink-player2.png",
-                flippedPlayerImg: "Pink_Monster2.png"
+                flippedPlayerImg: "Pink_Monster2.png",
+                jumpImg: "Dude_Monster_Jump_8.png"
             }),
 
         ];
