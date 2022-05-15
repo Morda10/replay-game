@@ -9,6 +9,7 @@ import {Anims, Player, playerJumpCol, playerWalkCol} from "./Player/Player";
 import { Trivia } from "./Trivia";
 import questions from "../../assets/data/triviaQuestions.json"
 import { audioEnums, audioFileNames } from "../index";
+import { Box, BoxT } from "./Environment/box";
 
 
 type PlayerState = {
@@ -31,6 +32,7 @@ type LevelState = {
     platforms: PlatformT[];
     doors: DoorT[];
     traps: TrapT[];
+    boxes: BoxT[];
 };
 
 type LevelProps = {
@@ -384,6 +386,32 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
                     y: -190,
                 },
             ],
+            boxes:[
+                {
+                    x:84,
+                    y:-162
+                },
+                {
+                    x:100,
+                    y:-162
+                },
+                {
+                    x:116,
+                    y:-162
+                },
+                {
+                    x:100,
+                    y:-146
+                },
+                {
+                    x:-50,
+                    y:-162
+                },
+                {
+                    x:-50,
+                    y:-162
+                },
+            ]
         };
     },
 
@@ -396,7 +424,7 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
         if (inputs.pointer.justPressed) {
             device.audio(audioFileNames[audioEnums.mario]).play();
         }
-        const { player: playerState, player2: playerState2 , floors, platforms, doors, traps } = state;
+        const { player: playerState, player2: playerState2 , floors, platforms, doors, traps, boxes } = state;
         const showTrivia = renderPlayer1Trivia(0, getInputs);
         const player = playerMovement(playerState, getInputs, floors, platforms);
         const player2 = playerMovement(playerState2, getInputs, floors, platforms, true);
@@ -420,13 +448,19 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
         if (isTouchingDoor(player.playerY, player.playerX, doors)) {
             console.log("Door!")
         }
+        if(isTouchingBox(player.playerY, player.playerX, boxes))
+        {
+            console.log("Box!")
+        }
+
         return {
             player,
             player2,
             floors,
             platforms,
             doors,
-            traps
+            traps,
+            boxes
         };
     },
     render({ state, device }) {
@@ -461,6 +495,12 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
                     id: `door-${index}`,
                     door: newDoor(door.x, door.y),
                 })
+            ),
+            ...state.boxes.map((box, index) =>
+              Box({
+                  id: `box-${index}`,
+                  box: newBox(box.x, box.y),
+              })
             ),
             Player({
                 id: "player",
@@ -512,6 +552,12 @@ function newTrap(x: number, y: number): TrapT {
         y,
     };
 }
+function newBox(x: number, y: number): BoxT {
+    return {
+        x,
+        y,
+    };
+}
 function newDoor(x: number, y: number): DoorT {
     return {
         x,
@@ -536,6 +582,18 @@ function isStandingFloor(playerY: number, playerX: number, floors: FloorT[], pla
     for (const floor of floors) {
         if (actualPlayerY <= (-185 + (floorHeight / 2)) && (actualPlayerX > floor.x - (floorWidth / 2) && actualPlayerX < floor.x + (floorWidth / 2))) {
             // standing on a floor (floor y is -185)
+            return true
+        }
+    }
+    return false
+}
+function isTouchingBox(playerY: number, playerX: number, boxes: BoxT[]) {
+    const actualPlayerX = playerX - 250;
+    const actualPlayerY = playerY - 157;
+    for (const box of boxes) {
+        const boxWidthDivided = boxWidth / 2
+        if (actualPlayerY >= box.y - (platformHeight / 2) && (actualPlayerX - playerWidth/2 < box.x + boxWidthDivided && actualPlayerX + playerWidth/2 > box.x - boxWidthDivided)) {
+            // touching box
             return true
         }
     }
@@ -568,6 +626,7 @@ function isTouchingTrap(playerY: number, playerX: number, traps: TrapT[]) {
 
 export const platformHeight = 12;
 export const playerHeight = 24;
+export const playerWidth = 24;
 export const floorWidth = 80;
 export const widePlatformWidth = 48;
 export const platformWidth = 16;
@@ -575,4 +634,6 @@ export const floorHeight = 32;
 export const doorWidth = 12;
 export const trapWidth = 22;
 export const trapHeight = 20;
+export const boxWidth = 16;
+export const boxHeight = 16;
 
