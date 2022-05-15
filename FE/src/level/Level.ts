@@ -180,6 +180,31 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
             ],
             platforms: [
                 {
+                    x: 160,
+                    y: -150,
+                    isWide: false
+                },
+                {
+                    x: 195,
+                    y: -150,
+                    isWide: false
+                },
+                {
+                    x: 230,
+                    y: -150,
+                    isWide: false
+                },
+                {
+                    x: 265,
+                    y: -150,
+                    isWide: false
+                },
+                {
+                    x: 300,
+                    y: -150,
+                    isWide: false
+                },
+                {
                     x: -220,
                     y: -120,
                     isWide: false
@@ -250,62 +275,88 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
                     isWide: true
                 },
             ],
-            doors: [{
-                x: 10,
-                y: -117,
-                open: false
-            },
-            {
-                x: 200,
-                y: -27,
-                open: false
-            },
-            {
-                x: -310,
-                y: -37,
-                open: false
-            },
+            doors: [
+                {
+                    x: 370,
+                    y: -163,
+                    open: false
+                }, {
+                    x: 10,
+                    y: -117,
+                    open: false
+                },
+                {
+                    x: 200,
+                    y: -27,
+                    open: false
+                },
+                {
+                    x: -310,
+                    y: -37,
+                    open: false
+                },
             ],
-            traps: [{
-                x: -110,
-                y: -190,
-            },
-            {
-                x: -132,
-                y: -190,
-            },
-            {
-                x: -154,
-                y: -190,
-            },
-            {
-                x: -176,
-                y: -190,
-            },
-            {
-                x: -198,
-                y: -190,
-            },
-            {
-                x: -220,
-                y: -190,
-            },
-            {
-                x: 150,
-                y: -190,
-            },
-            {
-                x: 172,
-                y: -190,
-            },
-            {
-                x: 194,
-                y: -190,
-            },
-            {
-                x: 216,
-                y: -175,
-            },
+            traps: [
+                {
+                    x: -110,
+                    y: -190,
+                },
+                {
+                    x: -132,
+                    y: -190,
+                },
+                {
+                    x: -154,
+                    y: -190,
+                },
+                {
+                    x: -176,
+                    y: -190,
+                },
+                {
+                    x: -198,
+                    y: -190,
+                },
+                {
+                    x: -220,
+                    y: -190,
+                },
+                {
+                    x: 150,
+                    y: -190,
+                },
+                {
+                    x: 172,
+                    y: -190,
+                },
+                {
+                    x: 194,
+                    y: -190,
+                },
+                {
+                    x: 216,
+                    y: -190,
+                },
+                {
+                    x: 238,
+                    y: -190,
+                },
+                {
+                    x: 260,
+                    y: -190,
+                },
+                {
+                    x: 282,
+                    y: -190,
+                },
+                {
+                    x: 304,
+                    y: -190,
+                },
+                {
+                    x: 326,
+                    y: -190,
+                },
             ],
         };
     },
@@ -453,7 +504,7 @@ function isTouchingDoor(playerY: number, playerX: number, doors: DoorT[]) {
     for (const door of doors) {
         const doorWidthDivided = doorWidth / 2
         if (actualPlayerY - (playerHeight / 2) >= door.y - (platformHeight / 2) && (actualPlayerX < door.x + doorWidthDivided && actualPlayerX > door.x - doorWidthDivided)) {
-            // standing on a platform
+            // touching door
             return true
         }
     }
@@ -465,7 +516,7 @@ function isTouchingTrap(playerY: number, playerX: number, traps: TrapT[]) {
     for (const trap of traps) {
         const trapWidthDivided = trapWidth / 2
         if (actualPlayerY - (playerHeight / 2) <= trap.y + (trapHeight / 2) && (actualPlayerX < trap.x + trapWidthDivided && actualPlayerX > trap.x - trapWidthDivided)) {
-            // standing on a platform
+            // touching trap
             return true
         }
     }
