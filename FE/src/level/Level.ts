@@ -1,4 +1,4 @@
-import { makeSprite, t } from "@replay/core";
+import { Device, makeSprite, t } from "@replay/core";
 import { WebInputs } from "@replay/web";
 import { iOSInputs } from "@replay/swift";
 import { Floor, FloorT } from "./Environment/floor";
@@ -8,6 +8,7 @@ import { Door, DoorT } from "./Environment/door";
 import { Player } from "./Player/Player";
 import { Trivia } from "./Trivia";
 import questions from "../../assets/data/triviaQuestions.json"
+import { audioEnums, audioFileNames } from "../index";
 
 
 type PlayerState = {
@@ -17,7 +18,8 @@ type PlayerState = {
     jumpForce: number;
     isFlippedImg: boolean;
     jumpY: number;
-    showTrivia: boolean;
+	  showTrivia: boolean;
+	  isDead: boolean;
 };
 
 type LevelState = {
@@ -74,7 +76,7 @@ const handlePlayerBounds = (playerX: number, playerY: number) => {
 
 const playerMovement = (playerState: PlayerState, getInputs: () => WebInputs, floors: FloorT[], platforms: PlatformT[], isPlayer2?: boolean) => {
     const inputs = getInputs();
-    let { playerGravity, playerY, playerX, isFlippedImg, jumpForce, jumpY, showTrivia } = playerState;
+    let { playerGravity, playerY, playerX, isFlippedImg, jumpForce, jumpY, showTrivia, isDead } = playerState;
 
     if (isPlayer2 ? inputs.keysDown[KEYS.KeyA] : inputs.keysDown[KEYS.ArrowLeft]) {
         playerX -= 2;
@@ -117,7 +119,8 @@ const playerMovement = (playerState: PlayerState, getInputs: () => WebInputs, fl
         playerY,
         playerX,
         isFlippedImg,
-        showTrivia
+        showTrivia,
+        isDead
     };
 };
 
@@ -145,7 +148,8 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
                 jumpForce: 0,
                 playerRot: 0,
                 isFlippedImg: false,
-                showTrivia: true
+                showTrivia: true,
+                isDead: false
 
             },
             player2: {
@@ -156,20 +160,21 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
                 jumpForce: 0,
                 playerRot: 0,
                 isFlippedImg: false,
-                showTrivia: true
+                showTrivia: true,
+                isDead: false
             },
             floors: [
                 {
                     x: -370
                 },
                 {
-                    x: -60
+                    x: -56
                 },
                 {
                     x: -260
                 },
                 {
-                    x: 20
+                    x: 22
                 },
                 {
                     x: 100
@@ -298,27 +303,27 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
             ],
             traps: [
                 {
-                    x: -110,
+                    x: -106,
                     y: -190,
                 },
                 {
-                    x: -132,
+                    x: -128,
                     y: -190,
                 },
                 {
-                    x: -154,
+                    x: -150,
                     y: -190,
                 },
                 {
-                    x: -176,
+                    x: -172,
                     y: -190,
                 },
                 {
-                    x: -198,
+                    x: -194,
                     y: -190,
                 },
                 {
-                    x: -220,
+                    x: -216,
                     y: -190,
                 },
                 {
@@ -360,12 +365,13 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
             ],
         };
     },
-    loop({ props, state, getInputs }) {
+
+
+    loop({ props, state, getInputs ,device}) {
         if (props.paused) {
             return state;
         }
-
-        const { player: playerState, player2: playerState2, floors, platforms, doors, traps } = state;
+        const { player: playerState, player2: playerState2 , floors, platforms, doors, traps } = state;
         const showTrivia = renderPlayer1Trivia(0, getInputs);
         const player = playerMovement(playerState, getInputs, floors, platforms);
         const player2 = playerMovement(playerState2, getInputs, floors, platforms, true);
@@ -373,7 +379,12 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
         if (isStandingFloor(player.playerY, player.playerX, floors, platforms)) {
             playerState.playerY = 0;
         }
-        if (isTouchingTrap(player.playerY, player.playerX, traps)) {
+        if(isTouchingTrap(player.playerY,player.playerX,traps))
+        {
+            playerState.isDead = true;
+            const deadSound = device.audio(audioFileNames[audioEnums.dead]);
+            deadSound.setVolume(0.1);
+            deadSound.play();
             console.log("Trap!")
         }
         if (isTouchingDoor(player.playerY, player.playerX, doors)) {
