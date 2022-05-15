@@ -2,9 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="081fc56d-5c66-4709-8ea9-0a4c13a982cc" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/FE/assets/images/Pink_Monster2.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/FE/assets/images/flipped-pink-player2.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/FE/assets/images/pink-player2.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/FE/src/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/FE/src/index.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/FE/src/level/Level.ts" beforeDir="false" afterPath="$PROJECT_DIR$/FE/src/level/Level.ts" afterDir="false" />
@@ -17,6 +14,14 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
   </component>
   <component name="ProjectId" id="29Bpsr3CWVny9JN6x2YDhyh9fdm" />
   <component name="ProjectViewState">
@@ -51,7 +56,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1652596552666</updated>
-      <workItem from="1652596555245" duration="11911000" />
+      <workItem from="1652596555245" duration="14923000" />
     </task>
     <servers />
   </component>

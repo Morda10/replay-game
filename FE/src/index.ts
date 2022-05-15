@@ -37,7 +37,7 @@ type GameState = {
 export enum audioEnums {
   boop,
   jump
-};
+}
 
 export const audioFileNames = [
   "boop.wav", "jump.wav"

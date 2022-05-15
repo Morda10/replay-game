@@ -31,9 +31,9 @@ export const KEYS = {
 
 const handlePlayerBounds = (playerX: number, playerY: number) => {
     const PLAYER_BOUNDS = {
-        x: 540,
+        x: 650,
         y: 150,
-        negX: 40,
+        negX: 150,
         negY: 0,
 
     };
@@ -66,15 +66,15 @@ const playerMovement = (playerState: PlayerState, getInputs: () => WebInputs, is
         isFlippedImg = false;
 
     }
-    if (isPlayer2 ? inputs.keysDown[KEYS.KeyW] : inputs.keysJustPressed[KEYS.ArrowUp]) {
+    if (isPlayer2 ? inputs.keysJustPressed[KEYS.KeyW] : inputs.keysJustPressed[KEYS.ArrowUp]) {
         playerGravity = -10;
     }
     if (playerY >= 60) {
         playerGravity = 6;
     }
-    if (playerY <= 0) {
-        playerY = 0;
-    }
+    // if (playerY <= 0) {
+    //     playerY = 0;
+    // }
 
     const { newX, newY } = handlePlayerBounds(playerX, playerY);
     playerX = newX;

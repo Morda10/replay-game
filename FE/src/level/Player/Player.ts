@@ -17,9 +17,12 @@ type PlayerState = {
   isFlippedImg: boolean;
 };
 
-const playPlayerSounds = (inputs: WebInputs, device: Device) => {
-  if (inputs.keysDown[KEYS.ArrowUp] || inputs.keysDown[KEYS.KeyW]) {
-    device.audio(audioFileNames[audioEnums.jump]).play();
+const playPlayerSounds = (inputs: WebInputs, { audio }: Device) => {
+  if (inputs.keysJustPressed[KEYS.ArrowUp] || inputs.keysJustPressed[KEYS.KeyW]) {
+    const a = audio(audioFileNames[audioEnums.jump]);
+    a.setVolume(0.1);
+    console.log(a.getVolume());
+    a.play();
   }
 }
 
