@@ -6,6 +6,8 @@ import { Platform, PlatformT } from "./Environment/platform";
 import { Trap, TrapT } from "./Environment/trap";
 import { Door, DoorT } from "./Environment/door";
 import { Player } from "./Player/Player";
+import { Trivia } from "./Trivia";
+import questions from "../../assets/data/triviaQuestions.json"
 
 
 type PlayerState = {
@@ -15,29 +17,38 @@ type PlayerState = {
     jumpForce: number;
     isFlippedImg: boolean;
     jumpY: number;
+	showTrivia: boolean;
 };
 
 type LevelState = {
-    player: PlayerState;
-    player2: PlayerState;
-    floors: FloorT[];
-    platforms: PlatformT[];
-    doors: DoorT[];
-    traps: TrapT[];
+	player: PlayerState;
+	player2: PlayerState;
+	floors: FloorT[];
+	platforms: PlatformT[];
+	doors: DoorT[];
+	traps: TrapT[];
 };
 
 type LevelProps = {
-    paused: boolean;
+	paused: boolean;
 };
 
 export const KEYS = {
-    ArrowLeft: 'ArrowLeft',
-    ArrowRight: 'ArrowRight',
-    ArrowUp: 'ArrowUp',
-    KeyW: 'w',
-    KeyA: 'a',
-    KeyD: 'd',
-    KeyS: 's'
+	ArrowLeft: 'ArrowLeft',
+	ArrowRight: 'ArrowRight',
+	ArrowUp: 'ArrowUp',
+	KeyW: 'w',
+	KeyA: 'a',
+	KeyD: 'd',
+	KeyS: 's',
+	ONE: '1',
+	TWO: '2',
+	THREE: '3',
+	FOUR: '4',
+	FIVE: '5',
+	SIX: '6',
+	SEVEN: '7',
+	EIGHT: '8',
 };
 
 const handlePlayerBounds = (playerX: number, playerY: number) => {
@@ -106,8 +117,21 @@ const playerMovement = (playerState: PlayerState, getInputs: () => WebInputs, fl
         jumpForce,
         playerY,
         playerX,
-        isFlippedImg
+        isFlippedImg,
+        showTrivia
     };
+};
+
+const renderPlayer1Trivia = (questionNumber: number, getInputs: () => WebInputs) => {
+	const question = questions.playerOneQuestions[questionNumber];
+	const answerId = question.correctAnswer.id;
+	const inputs = getInputs();
+
+	if (inputs.keysDown[answerId]) {
+		console.log('correct!');
+		return false;
+	}
+	return true;
 };
 
 export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
@@ -122,6 +146,7 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
                 jumpForce: 0,
                 playerRot: 0,
                 isFlippedImg: false,
+
             },
             player2: {
                 playerY: 0,
@@ -130,7 +155,8 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
                 jumpY: 0,
                 jumpForce: 0,
                 playerRot: 0,
-                isFlippedImg: false
+                isFlippedImg: false,
+                showTrivia: true
             },
             floors:[
                 {
@@ -289,8 +315,14 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
         }
 
         const { player: playerState, player2: playerState2 , floors, platforms, doors, traps} = state;
-        const player  = playerMovement(playerState, getInputs, floors, platforms);
-        const player2  = playerMovement(playerState2, getInputs, floors, platforms, true);
+        const showTrivia = renderPlayer1Trivia(0, getInputs);
+        const player  = playerMovement(playerState, getInputs);
+        const player2  = playerMovement(playerState2, getInputs, true);
+        player.showTrivia = showTrivia;
+        if(isStandingFloor(player.playerY,player.playerX,floors,platforms))
+        {
+            playerState.playerY = 0;
+        }
         if(isTouchingTrap(player.playerY,player.playerX,traps))
         {
             console.log("Trap!")
@@ -310,6 +342,7 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
     },
     render({ state, device }) {
         const { size } = device;
+        const { player: playerState } = state;
         return [
             t.rectangle({
                 color: "#add8e6",
@@ -356,6 +389,14 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
                 playerImg: "flipped-pink-player2.png",
                 flippedPlayerImg: "Pink_Monster2.png"
             }),
+            playerState.showTrivia ? Trivia({
+                id: "menu1",
+                playerNumber: 0
+            }) : null,
+            Trivia({
+                id: "menu2",
+                playerNumber: 1
+            })
 
         ];
     },
