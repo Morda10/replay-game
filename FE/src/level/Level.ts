@@ -3,10 +3,10 @@ import { WebInputs } from "@replay/web";
 import { iOSInputs } from "@replay/swift";
 import { Floor, FloorT } from "./Environment/floor";
 import { Platform, PlatformT } from "./Environment/platform";
-import { WidePlatform, WidePlatformT } from "./Environment/wide_platform";
 import { Trap, TrapT } from "./Environment/trap";
 import { Door, DoorT } from "./Environment/door";
 import { Player } from "./Player/Player";
+
 
 type PlayerState = {
     playerY: number;
@@ -18,6 +18,8 @@ type PlayerState = {
 type LevelState = {
     player: PlayerState;
     player2: PlayerState;
+    floors: FloorT[];
+    platforms: PlatformT[];
 };
 
 type LevelProps = {
@@ -47,7 +49,7 @@ const handlePlayerBounds = (playerX: number, playerY: number) => {
     if (playerX > PLAYER_BOUNDS.x) newX = PLAYER_BOUNDS.x;
     if (playerX < -PLAYER_BOUNDS.negX) newX = -PLAYER_BOUNDS.negX;
     if (playerY > PLAYER_BOUNDS.y) newY = PLAYER_BOUNDS.y;
-    if (playerY < -PLAYER_BOUNDS.negY) newY = -PLAYER_BOUNDS.negY;
+    //if (playerY < -PLAYER_BOUNDS.negY) newY = -PLAYER_BOUNDS.negY;
 
     return {
         newX,
@@ -111,7 +113,35 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
                 playerGravity: 6,
                 playerRot: 0,
                 isFlippedImg: false
-            }
+            },
+            floors:[{
+                    x: -60
+                    },
+                    {
+                    x: -240
+                    },
+            ],
+            platforms:[{
+                x: -80,
+                y: -130,
+                isWide: false
+            },
+                {
+                    x: -50,
+                    y: -110,
+                    isWide: false
+                },
+                {
+                    x: -20,
+                    y: -90,
+                    isWide: false
+                },
+                {
+                    x: 10,
+                    y: -130,
+                    isWide: true
+                },
+            ]
         };
     },
     loop({ props, state, getInputs }) {
@@ -119,12 +149,19 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
             return state;
         }
 
-        const { player: playerState, player2: playerState2 } = state;
+        const { player: playerState, player2: playerState2 , floors, platforms} = state;
         const player  = playerMovement(playerState, getInputs);
         const player2  = playerMovement(playerState2, getInputs, true);
+        if(isStandingFloor(player.playerY,player.playerX,floors,platforms))
+        {
+            playerState.playerY = 0;
+        }
+        //console.log(isStandingFloor(player.playerY,player.playerX,floors,platforms))
         return {
             player,
-            player2
+            player2,
+            floors,
+            platforms
         };
     },
     render({ state, device }) {
@@ -135,38 +172,26 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
                 width: size.width + size.widthMargin * 2,
                 height: size.height + size.heightMargin * 2,
             }),
-            Floor({
-                floor: newFloor(-160),
-                id: "floor"
-            }),
-            Floor({
-                floor: newFloor(-60),
-                id: "floor1"
-            }),
             Trap({
                 trap: newTrap(-110, -190),
                 id: "trap"
-            }),
-            Platform({
-                platform: newPlatform(-80, -130),
-                id: "platform1"
-            }),
-            Platform({
-                platform: newPlatform(-50, -110),
-                id: "platform2"
-            }),
-            Platform({
-                platform: newPlatform(-20, -90),
-                id: "platform3"
-            }),
-            WidePlatform({
-                platform: newWidePlatform(10, -130),
-                id: "wide_platform"
             }),
             Door({
                 door: newDoor(10, -85),
                 id: "door"
             }),
+            ...state.floors.map((floor, index) =>
+              Floor({
+                  id: `floor-${index}`,
+                  floor: newFloor(floor.x),
+              })
+            ),
+            ...state.platforms.map((platform, index) =>
+              Platform({
+                  id: `platform-${index}`,
+                  platform: newPlatform(platform.x, platform.y, platform.isWide),
+              })
+            ),
             Player({
                 id: "player",
                 x: state.player.playerX,
@@ -192,16 +217,11 @@ function newFloor(x: number): FloorT {
         x,
     };
 }
-function newPlatform(x: number, y: number): PlatformT {
+function newPlatform(x: number, y: number, isWide: boolean): PlatformT {
     return {
         x,
         y,
-    };
-}
-function newWidePlatform(x: number, y: number): WidePlatformT {
-    return {
-        x,
-        y,
+        isWide
     };
 }
 function newTrap(x: number, y: number): TrapT {
@@ -217,3 +237,28 @@ function newDoor(x: number, y: number): DoorT {
         open: false
     };
 }
+function isStandingFloor(playerY: number,playerX: number,floors: FloorT[], platforms: PlatformT[]) {
+    const actualPlayerX = playerX -250;
+    const actualPlayerY = playerY -157;
+    console.log(actualPlayerY);
+    for (const platform of platforms) {
+        const platformWidthDivided = (platform.isWide?widePlatformWidth:platformWidth)/2
+        if (actualPlayerY - (playerHeight/2) >= platform.y-(platformHeight/2) && (actualPlayerX < platform.x + platformWidthDivided && actualPlayerX > platform.x - platformWidthDivided)) {
+            // standing on a platform
+            return true
+        }
+    }
+    for (const floor of floors) {
+        if (actualPlayerY -(playerHeight/2) <= -185 && (actualPlayerX > floor.x - (floorWidth/2) && actualPlayerX < floor.x + (floorWidth/2))) {
+            // standing on a floor (floor y is -185)
+            return true
+        }
+    }
+    return false
+}
+export const platformHeight = 12;
+export const playerHeight = 24;
+export const floorWidth = 80;
+export const widePlatformWidth = 48;
+export const platformWidth = 16;
+
