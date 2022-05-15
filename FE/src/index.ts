@@ -36,11 +36,13 @@ type GameState = {
 
 export enum audioEnums {
   boop,
-  jump
+  jump,
+  dead,
+  mario
 }
 
 export const audioFileNames = [
-  "boop.wav", "jump.wav"
+	"boop.wav", "jump.wav","dead.wav", "01 here we go.mp3"
 ];
 export const imgFileNames = [
   "icon.png", "Pink_Monster.png", "flipped-pink-player.png", "Pink_Monster2.png", "flipped-pink-player2.png", "Dude_Monster_Jump_8.png", "Dude_Monster_Walk_flip.png", "Dude_Monster_Walk_6.png",
@@ -55,16 +57,14 @@ export const Game = makeSprite<GameProps, GameState, WebInputs | iOSInputs>({
     }).then(() => {
       updateState((state) => ({ ...state, loaded: true }));
     });
-
     return {
       loaded: false,
       view: "level"
     };
   },
 
-  loop({ state }) {
+  loop({ state, device }) {
     if (!state.loaded) return state;
-
 
     return {
       loaded: true,
