@@ -1,6 +1,11 @@
 import { makeSprite, t } from "@replay/core";
 import { WebInputs } from "@replay/web";
 import { iOSInputs } from "@replay/swift";
+import { Floor, FloorT } from "./Environment/floor";
+import { Platform, PlatformT } from "./Environment/platform";
+import { WidePlatform, WidePlatformT } from "./Environment/wide_platform";
+import { Trap, TrapT } from "./Environment/trap";
+import { Door, DoorT } from "./Environment/door";
 import { Player } from "./Player/Player";
 
 type PlayerState = {
@@ -117,7 +122,6 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
         const { player: playerState, player2: playerState2 } = state;
         const player  = playerMovement(playerState, getInputs);
         const player2  = playerMovement(playerState2, getInputs, true);
-
         return {
             player,
             player2
@@ -130,6 +134,38 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
                 color: "#add8e6",
                 width: size.width + size.widthMargin * 2,
                 height: size.height + size.heightMargin * 2,
+            }),
+            Floor({
+                floor: newFloor(-160),
+                id: "floor"
+            }),
+            Floor({
+                floor: newFloor(-60),
+                id: "floor1"
+            }),
+            Trap({
+                trap: newTrap(-110, -190),
+                id: "trap"
+            }),
+            Platform({
+                platform: newPlatform(-80, -130),
+                id: "platform1"
+            }),
+            Platform({
+                platform: newPlatform(-50, -110),
+                id: "platform2"
+            }),
+            Platform({
+                platform: newPlatform(-20, -90),
+                id: "platform3"
+            }),
+            WidePlatform({
+                platform: newWidePlatform(10, -130),
+                id: "wide_platform"
+            }),
+            Door({
+                door: newDoor(10, -85),
+                id: "door"
             }),
             Player({
                 id: "player",
@@ -147,6 +183,37 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
                 playerImg: "flipped-pink-player2.png",
                 flippedPlayerImg: "Pink_Monster2.png"
             }),
+
         ];
     },
 });
+function newFloor(x: number): FloorT {
+    return {
+        x,
+    };
+}
+function newPlatform(x: number, y: number): PlatformT {
+    return {
+        x,
+        y,
+    };
+}
+function newWidePlatform(x: number, y: number): WidePlatformT {
+    return {
+        x,
+        y,
+    };
+}
+function newTrap(x: number, y: number): TrapT {
+    return {
+        x,
+        y,
+    };
+}
+function newDoor(x: number, y: number): DoorT {
+    return {
+        x,
+        y,
+        open: false
+    };
+}
