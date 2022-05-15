@@ -14,6 +14,7 @@ type PlayerState = {
     playerGravity: number;
     jumpForce: number;
     isFlippedImg: boolean;
+    jumpY: number;
 };
 
 type LevelState = {
@@ -42,7 +43,7 @@ export const KEYS = {
 const handlePlayerBounds = (playerX: number, playerY: number) => {
     const PLAYER_BOUNDS = {
         x: 650,
-        y: 150,
+        y: 500,
         negX: 150,
         negY: 0,
 
@@ -62,7 +63,7 @@ const handlePlayerBounds = (playerX: number, playerY: number) => {
 
 const playerMovement = (playerState: PlayerState, getInputs: () => WebInputs, floors: FloorT[], platforms: PlatformT[], isPlayer2?: boolean) => {
     const inputs = getInputs();
-    let { playerGravity, playerY, playerX, isFlippedImg, jumpForce } = playerState;
+    let { playerGravity, playerY, playerX, isFlippedImg, jumpForce, jumpY } = playerState;
 
     if (isPlayer2 ? inputs.keysDown[KEYS.KeyA] :  inputs.keysDown[KEYS.ArrowLeft]) {
         playerX -= 2;
@@ -77,9 +78,10 @@ const playerMovement = (playerState: PlayerState, getInputs: () => WebInputs, fl
     if (isPlayer2 ? inputs.keysJustPressed[KEYS.KeyW] : inputs.keysJustPressed[KEYS.ArrowUp]) {
         if (isGrounded) {
             jumpForce = -10;
+            jumpY = playerY;
         }
     }
-    if (playerY >= 60) {
+    if (playerY >= jumpY + 50) {
         jumpForce = 0;
     }
 
@@ -100,6 +102,7 @@ const playerMovement = (playerState: PlayerState, getInputs: () => WebInputs, fl
 
     return {
         playerGravity,
+        jumpY,
         jumpForce,
         playerY,
         playerX,
@@ -115,6 +118,7 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
                 playerY: 0,
                 playerX: 0,
                 playerGravity: 6,
+                jumpY: 0,
                 jumpForce: 0,
                 playerRot: 0,
                 isFlippedImg: false,
@@ -123,6 +127,7 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
                 playerY: 0,
                 playerX: -20,
                 playerGravity: 6,
+                jumpY: 0,
                 jumpForce: 0,
                 playerRot: 0,
                 isFlippedImg: false
@@ -284,12 +289,8 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
         }
 
         const { player: playerState, player2: playerState2 , floors, platforms, doors, traps} = state;
-        const player  = playerMovement(playerState, getInputs);
-        const player2  = playerMovement(playerState2, getInputs, true);
-        if(isStandingFloor(player.playerY,player.playerX,floors,platforms))
-        {
-            playerState.playerY = 0;
-        }
+        const player  = playerMovement(playerState, getInputs, floors, platforms);
+        const player2  = playerMovement(playerState2, getInputs, floors, platforms, true);
         if(isTouchingTrap(player.playerY,player.playerX,traps))
         {
             console.log("Trap!")
@@ -298,10 +299,6 @@ export const Level = makeSprite<LevelProps, LevelState, WebInputs | iOSInputs>({
         {
             console.log("Door!")
         }
-        const { player: playerState, player2: playerState2 , floors, platforms} = state;
-        const player  = playerMovement(playerState, getInputs, floors, platforms);
-        const player2  = playerMovement(playerState2, getInputs, floors, platforms, true);
-
         return {
             player,
             player2,
@@ -392,8 +389,12 @@ function isStandingFloor(playerY: number,playerX: number,floors: FloorT[], platf
     const actualPlayerX = playerX -250;
     const actualPlayerY = playerY -157 - (playerHeight / 2);
     for (const platform of platforms) {
-        const platformWidthDivided = (platform.isWide?widePlatformWidth:platformWidth)/2
-        if (actualPlayerY >= platform.y-(platformHeight/2) && (actualPlayerX < platform.x + platformWidthDivided && actualPlayerX > platform.x - platformWidthDivided)) {
+        const platformWidthDivided = (platform.isWide?widePlatformWidth:platformWidth)/2;
+        const isBetweenPlatformX = (actualPlayerX < platform.x + platformWidthDivided && actualPlayerX > platform.x - platformWidthDivided)
+        const isPlayerUnderPlatform = actualPlayerY <= platform.y+(platformHeight/2);
+        const isPlayerAbovePlatform = actualPlayerY > platform.y-(platformHeight/2);
+        const isPlatformUnderPlayer = isPlayerUnderPlatform && isBetweenPlatformX && isPlayerAbovePlatform;
+        if (isPlatformUnderPlayer) {
             // standing on a platform
             return true
         }
