@@ -34,11 +34,20 @@ type GameState = {
   view: "menu" | "level";
 };
 
+export enum audioEnums {
+  boop,
+  jump
+};
+
+export const audioFileNames = [
+  "boop.wav", "jump.wav"
+];
+
 export const Game = makeSprite<GameProps, GameState, WebInputs | iOSInputs>({
   init({ updateState, preloadFiles }) {
     preloadFiles({
-      audioFileNames: ["boop.wav"],
-      imageFileNames: ["icon.png", "Pink_Monster.png", "flipped-pink-player.png","floor.png","platform.png","wide_platform.png","Trap.png","door_opened.png","door_closed.png"],
+      audioFileNames: audioFileNames,
+      imageFileNames: ["icon.png", "Pink_Monster.png", "flipped-pink-player.png", "Pink_Monster2.png", "flipped-pink-player2.png","floor.png","platform.png","wide_platform.png","Trap.png","door_opened.png","door_closed.png"],
     }).then(() => {
       updateState((state) => ({ ...state, loaded: true }));
     });
@@ -52,22 +61,9 @@ export const Game = makeSprite<GameProps, GameState, WebInputs | iOSInputs>({
   loop({ state }) {
     if (!state.loaded) return state;
 
-    // const { pointer } = getInputs();
-    // const { posX, posY } = state;
-    // let { targetX, targetY } = state;
-
-    // if (pointer.justPressed) {
-    //   device.audio("boop.wav").play();
-    //   targetX = pointer.x;
-    //   targetY = pointer.y;
-    // }
 
     return {
       loaded: true,
-      // posX: posX + (targetX - posX) / 10,
-      // posY: posY + (targetY - posY) / 10,
-      // targetX,
-      // targetY,
       view: "level"
     };
   },
