@@ -1,4 +1,5 @@
 import { makeSprite, t } from "@replay/core";
+import { floorWidth } from "../Level";
 
 export type FloorT = {
   x: number;
@@ -13,7 +14,7 @@ export const Floor = makeSprite<FloorProps>({
     const { floor } = props;
     return [
       t.image({
-        height: 32, width: 80,
+        height: 32, width: floorWidth,
         fileName: "floor.png",
         x: floor.x,
         y: -185

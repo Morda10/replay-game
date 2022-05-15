@@ -1,4 +1,5 @@
 import { makeSprite, t } from "@replay/core";
+import { doorWidth } from "../Level";
 
 export type DoorT = {
   x: number;
@@ -15,7 +16,7 @@ export const Door = makeSprite<DoorProps>({
     const { door } = props;
     return [
       t.image({
-        height: 16, width: 12,
+        height: 16, width: doorWidth,
         fileName: door.open ? "door_opened.png" : "door_closed.png",
         x: door.x,
         y: door.y
